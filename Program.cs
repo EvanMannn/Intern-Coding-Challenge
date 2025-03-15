@@ -7,8 +7,9 @@ using Newtonsoft.Json.Linq;
 
 class Program {
     static void Main(string[] args) {
-        Sensor jsonSensor = new("./Samples/SampleData2.json");
-        Sensor csvSensor = new("./Samples/SampleData1.csv");
+        Sensor csvSensor = new("./SensorData1.csv");
+        Sensor jsonSensor = new("./SensorData2.json");
+        
 
         Sensor.compareSensors(csvSensor, jsonSensor);
     }
@@ -42,11 +43,19 @@ public class Sensor {
     }
 
     public static void compareSensors(Sensor sensor1, Sensor sensor2) {
-        
-        Console.WriteLine(lambertEllipsodialDistance(sensor1.data[0], sensor2.data[0]));
-        //Compare the values of sensor 1 to 2 via the haversin equation for distance between points along a great circle
-        //If distance under 0.1 km then store id of sensor 1 as key for id of sensor 2 in output dictionary
-        //Output the dictionary as a .json file
+        Dictionary<string, int> correlatedSensorReadings = new Dictionary<string, int>();
+
+        foreach (var sen1Data in sensor1.data) {
+            foreach (var sen2Data in sensor2.data) {
+                float distance = lambertEllipsodialDistance(sen1Data, sen2Data);
+                if (distance < 100) {
+                    correlatedSensorReadings[sen1Data.id.ToString()] = sen2Data.id;
+                }
+            }
+        }
+        foreach (var datum in correlatedSensorReadings.Keys) {
+            Console.WriteLine($"{datum} : {correlatedSensorReadings[datum]}");
+        }
     }
 
     private static float lambertEllipsodialDistance(SensorData sd1, SensorData sd2) {

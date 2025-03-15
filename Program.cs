@@ -1,16 +1,12 @@
 ﻿using System.Globalization;
-using System.Net.Http.Headers;
 using CsvHelper;
-using Microsoft.VisualBasic;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 class Program {
     static void Main(string[] args) {
         Sensor csvSensor = new("./SensorData1.csv");
         Sensor jsonSensor = new("./SensorData2.json");
         
-
         Sensor.compareSensors(csvSensor, jsonSensor);
     }
 }

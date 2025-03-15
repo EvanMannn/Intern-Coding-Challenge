@@ -1,13 +1,4 @@
-# CUAVs-Coding-Challenge
-
-Challenge Overview:
-
-At Canadian UAVs, we handle large amounts of geospatial data, which is the focus of this challenge. The task involves correlating data from two sensors that detect anomalies. However, the sensors are not highly accurate, resulting in false positives and variations in their location readings. Your challenge is to associate the sensor readings based on their coordinates to identify common signals that may have been detected by both sensors. This correlation increases the likelihood that the signal is a genuine detection rather than a false positive.
-
-Input Data:
-
-The two sensors provide different output formats: one sensor outputs data in CSV format, and the other outputs data in JSON format. Please refer to the sample data for the exact format of each sensor's output. Both sensors assign a unique ID to each reading, but note that different sensors may use the same IDs. The sensor readings include location coordinates in decimal degrees, using the WGS 84 format, representing where the anomaly was detected. The sensors have an accuracy of 100 meters, meaning that the reported location is within 100 meters of the actual anomaly location.
-
-Output:
-
-The output should consist of pairs of IDs, where one ID is from the first sensor, and the second ID is from the second sensor.
+# Canadian UAVs Internship Coding Challenge
+## By Evan Mann
+This C# program has been developed to solve the problem posed by Canadian UAVs for their Software Developer Intern role. <br><br>
+This solution makes use of the packages CsvHelper and Newtonsoft's Json package to read and write CSV and JSON files. This allowed me to read the inputs from the sensors, and output the final comparisons to a seperate JSON. The structure of this program revoles around the main class Sensor which is used to load, store, and process the data from the files. It contains static methods for both comparing two sets of sensor data, and preforming a Lambert distance calculation for the distance between two points. These come along side methods for loading data into it from either CSV or JSON files, and a dynamic constructor that repsonds to the file path of the data used to construct it. The Lambert formula for distance between two points on the outside of an ellipsoid was chosen for its greater accuracy due to accounting for the difference between lengths of the equatorial and polar axes of the Earth. Using this calculation, the two sensors could have each data point compared, and if the readings were within 100m of eachother, the described accuracy of the sensors, it was determined that the readings were correlated and the IDs were stored in the JSON file that is outputed. To run the program, with dotnet installed, run dotnet restore to obtain the dependancies mentioned above, and dotnet run to run the program. The terminal should output a confirmation that the file was created, and "SensorDataComparisonOutput.json" should be updated in the directory where this program exists on your computer. This output already exists, however if deleted it will be regenerated. 

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Intern-Coding-Challenge")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+627d9121fdf5d8bdd79f8c2801ae5612b011e5f9")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5d5788732ff3955ee1c3f16e28c5895c521f5712")]
 [assembly: System.Reflection.AssemblyProductAttribute("Intern-Coding-Challenge")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Intern-Coding-Challenge")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

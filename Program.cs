@@ -53,9 +53,8 @@ public class Sensor {
                 }
             }
         }
-        foreach (var datum in correlatedSensorReadings.Keys) {
-            Console.WriteLine($"{datum} : {correlatedSensorReadings[datum]}");
-        }
+        string outputJSON = JsonConvert.SerializeObject(correlatedSensorReadings, Formatting.Indented);
+        File.WriteAllText("SensorDataComparisonOutput.json", outputJSON);
     }
 
     private static float lambertEllipsodialDistance(SensorData sd1, SensorData sd2) {

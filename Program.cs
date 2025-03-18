@@ -1,60 +1,97 @@
 ﻿using System.Globalization;
+
+//Dependancies
 using CsvHelper;
 using Newtonsoft.Json;
 
+//Main program file that acts as an entrance for the main function
 class Program {
-    static void Main(string[] args) {
+    static void Main() {
+        //Load the data for each of the files into new sensor classes
         Sensor csvSensor = new("./SensorData1.csv");
         Sensor jsonSensor = new("./SensorData2.json");
-        
+
+        //Compare the data and output the results into the JSON
         Sensor.compareSensors(csvSensor, jsonSensor);
     }
 }
 
 public class Sensor {
+    //Container for the data gathered by the sensor
     private List<SensorData> data { get; } = new List<SensorData>();
     
+    //Constructor that reads the filepath
     public Sensor(string filePath) {
-        if (filePath.Contains(".json")) {
+        if (filePath.EndsWith(".json")) {
             data = LoadJsonData(filePath);
         }
-        else if (filePath.Contains(".csv")) {
+        else if (filePath.EndsWith(".csv")) {
             data = LoadCsvData(filePath);
         }
-    }
-
-    private List<SensorData> LoadCsvData(string filePath) {
-        //Loading CSV data
-        using (var csv_reader = new StreamReader(filePath)) 
-        using (var csv_input = new CsvReader(csv_reader, CultureInfo.InvariantCulture))
-        {
-            return [.. csv_input.GetRecords<SensorData>()];
+        else {
+            throw new ArgumentException($"{filePath} has a invalid file ending, valid endings include .csv and .json");
         }
     }
 
-    private List<SensorData> LoadJsonData(string filePath) {
-        //Loading JSON data
-        string json_input = File.ReadAllText(filePath);
-        return JsonConvert.DeserializeObject<List<SensorData>>(json_input) ?? new List<SensorData>();
+    //CSV data loader helper function
+    private List<SensorData> LoadCsvData(string filePath) {
+        //File ending check
+        if (filePath.EndsWith(".csv")) {
+            using (var csv_reader = new StreamReader(filePath)) 
+            using (var csv_input = new CsvReader(csv_reader, CultureInfo.InvariantCulture))
+            {
+                return [.. csv_input.GetRecords<SensorData>()];
+            }
+        }
+        //Return emtpy list if invalid
+        else {
+            Console.Error.WriteLine($"{filePath} has a invalid file ending, must be .csv. Returning empty list");
+            return new List<SensorData>();
+        }
     }
 
+    //JSON data loader helper function
+    private List<SensorData> LoadJsonData(string filePath) {
+        //File ending check
+        if (filePath.EndsWith(".json")) {
+            string json_input = File.ReadAllText(filePath);
+            return JsonConvert.DeserializeObject<List<SensorData>>(json_input) ?? new List<SensorData>();
+        }
+        //Return empty list if invlaid
+        else {
+            Console.Error.WriteLine($"{filePath} has a invalid file ending, must be .json. Returning empty list");
+            return new List<SensorData>();
+        }
+    }
+
+    //Static method to comapre Sensors 
     public static void compareSensors(Sensor sensor1, Sensor sensor2) {
+        //Input checking 
+        if (sensor1 == null || sensor2 == null) {
+            throw new ArgumentException("Invalid input, sensors cannot be null");
+        }
+        
+        //Instantiate the output dictionary 
         Dictionary<string, int> correlatedSensorReadings = new Dictionary<string, int>();
 
+        //Check each data point against each other datapoint with the distance function
         foreach (var sen1Data in sensor1.data) {
             foreach (var sen2Data in sensor2.data) {
                 float distance = lambertEllipsodialDistance(sen1Data, sen2Data);
                 if (distance < 100) {
+                    //If the returned distance is < 100 m then add the correlation to the output dictionary 
                     correlatedSensorReadings[sen1Data.id.ToString()] = sen2Data.id;
                 }
             }
         }
+
+        //Convert the dictionary to JSON
         string outputJSON = JsonConvert.SerializeObject(correlatedSensorReadings, Formatting.Indented);
         File.WriteAllText("SensorDataComparisonOutput.json", outputJSON);
     }
 
     private static float lambertEllipsodialDistance(SensorData sd1, SensorData sd2) {
-        const float EQUATORIAL_RADIUS = 6378137.0f;     //Earth's equatorial radius              //
+        const float EQUATORIAL_RADIUS = 6378137.0f;     //Earth's equatorial radius
         const float POLAR_RADIUS = 6356752.0f;          //Earth's polar radius
 
         //A coefficient to represent how flattened the Earth is.
@@ -66,6 +103,7 @@ public class Sensor {
         float lat2Rad = sd2.latitude * MathF.PI/180.0f;
         float long2Rad = sd2.longitude * MathF.PI/180.0f;
 
+        //Convert all angles to positive values
         if (lat1Rad < 0) lat1Rad += 2.0f * MathF.PI;
         if (long1Rad < 0) long1Rad += 2.0f * MathF.PI;
         if (lat2Rad < 0) lat2Rad += 2.0f * MathF.PI;
@@ -103,6 +141,7 @@ public class Sensor {
         return EQUATORIAL_RADIUS * (centralAngle - (EARTH_FLATTENING / 2.0f * (X + Y)));
     }
 
+    //Helper function to print the data stored in a Sensor, used particularly in testing
     public void printData() {
         foreach (var datum in data) {
             Console.WriteLine($"ID: {datum.id} LATITUDE: {datum.latitude} LONGITUDE: {datum.longitude}");
@@ -110,6 +149,7 @@ public class Sensor {
     }
 }
 
+//Sensor data container
 public class SensorData {
     public int id {get; set; }
     public float latitude {get; set; }
